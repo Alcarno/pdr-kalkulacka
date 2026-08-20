@@ -400,6 +400,7 @@
             <div class="totals">
               <div><span>Součet před materiálem</span><strong id="sum-before-material"></strong></div>
               <div><span>Drobný materiál 2 %</span><strong id="sum-material"></strong></div>
+              <div><span id="dismantling-label">Demontáž</span><strong id="sum-dismantling"></strong></div>
               <div><span>Celkem bez DPH</span><strong id="sum-without-vat"></strong></div>
               <div><span>DPH 21 %</span><strong id="sum-vat"></strong></div>
               <div class="total"><span>Celkem s DPH</span><span id="sum-with-vat"></span></div>
@@ -408,7 +409,7 @@
               <button type="button" id="print-result" class="btn btn-secondary">Tisk / PDF</button>
             </div>
           </div>
-          <p class="note">U každého dílu lze průměr změnit, pokud se liší od výchozího. Stejný díl lze přidat vícekrát.</p>
+          <p class="note">U každého dílu lze průměr změnit, pokud se liší od výchozího. Demontáž je 2 500 Kč do 50 000 Kč ceníku dílů, nad 50 000 Kč je 3 000 Kč.</p>
         </section>
       </div>
 
@@ -555,6 +556,6 @@
         </section>
       </div>
     </main>
-    <script src="app.js?v=5"></script>
+    <script src="app.js?v=6"></script>
   </body>
 </html>
