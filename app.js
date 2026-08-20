@@ -383,8 +383,9 @@ function calculatePdrPrice(damageParts) {
   }
 
   const materialAddition = round2(totalPrice * 0.02);
-  const dismantling = totalPrice <= 50000 ? 2500 : 3000;
-  const priceWithoutVat = round2(totalPrice + materialAddition + dismantling);
+  const repairWithoutVat = round2(totalPrice + materialAddition);
+  const dismantling = repairWithoutVat <= 50000 ? 2500 : 3000;
+  const priceWithoutVat = round2(repairWithoutVat + dismantling);
   const vatAmount = round2(priceWithoutVat * 0.21);
   const priceWithVat = round2(priceWithoutVat + vatAmount);
 
@@ -394,6 +395,7 @@ function calculatePdrPrice(damageParts) {
     calculationDetails,
     totalBeforeMaterial: totalPrice,
     materialAddition,
+    repairWithoutVat,
     dismantling,
     vatAmount,
   };
@@ -524,9 +526,9 @@ function renderResult() {
   document.getElementById("sum-before-material").textContent = formatCzk(prices.totalBeforeMaterial);
   document.getElementById("sum-material").textContent = formatCzk(prices.materialAddition);
   document.getElementById("dismantling-label").textContent =
-    prices.totalBeforeMaterial <= 50000
-      ? "Demontáž (do 50 000 Kč)"
-      : "Demontáž (nad 50 000 Kč)";
+    prices.repairWithoutVat <= 50000
+      ? "Demontáž (z ceny opravy bez DPH do 50 000 Kč)"
+      : "Demontáž (z ceny opravy bez DPH nad 50 000 Kč)";
   document.getElementById("sum-dismantling").textContent = formatCzk(prices.dismantling);
   document.getElementById("sum-without-vat").textContent = formatCzk(prices.priceWithoutVat);
   document.getElementById("sum-vat").textContent = formatCzk(prices.vatAmount);
