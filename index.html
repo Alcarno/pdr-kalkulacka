@@ -29,7 +29,7 @@
       }
 
       main {
-        max-width: 880px;
+        max-width: 960px;
         margin: 0 auto;
         padding: 32px 16px 48px;
       }
@@ -40,8 +40,32 @@
       }
 
       .subtitle {
-        margin: 0 0 24px;
+        margin: 0 0 20px;
         color: var(--muted);
+      }
+
+      .tabs {
+        display: flex;
+        gap: 8px;
+        margin: 0 0 20px;
+        border-bottom: 1px solid var(--line);
+      }
+
+      .tab {
+        border: 0;
+        background: transparent;
+        color: var(--muted);
+        font: inherit;
+        padding: 10px 14px 12px;
+        cursor: pointer;
+        border-bottom: 2px solid transparent;
+        margin-bottom: -1px;
+      }
+
+      .tab.is-active {
+        color: var(--accent);
+        font-weight: 600;
+        border-bottom-color: var(--accent);
       }
 
       .card {
@@ -204,6 +228,29 @@
         color: var(--muted);
       }
 
+      .table-wrap {
+        overflow-x: auto;
+      }
+
+      .pricelist-table th,
+      .pricelist-table td {
+        white-space: nowrap;
+      }
+
+      .pricelist-table thead th {
+        position: sticky;
+        top: 0;
+        background: #fff;
+      }
+
+      .pricelist-intro {
+        margin: 0 0 16px;
+      }
+
+      .pricelist-diameters {
+        margin: 0 0 16px;
+      }
+
       @media (max-width: 640px) {
         .part-row {
           grid-template-columns: 1fr;
@@ -216,52 +263,84 @@
       <h1>PDR kalkulačka</h1>
       <p class="subtitle">Výpočet opravy důlků podle ceníku Doktor Dülek. Každý díl se počítá zvlášť.</p>
 
-      <form id="pdr-form">
-        <section class="card">
-          <h2>Průměr důlků</h2>
-          <div class="diameter-options">
-            <label><input type="radio" name="diameter" value="20" checked> <span>20 mm</span></label>
-            <label><input type="radio" name="diameter" value="30"> <span>30 mm</span></label>
-            <label><input type="radio" name="diameter" value="40"> <span>40 mm</span></label>
-          </div>
-        </section>
+      <nav class="tabs" role="tablist" aria-label="Sekce">
+        <button type="button" class="tab is-active" role="tab" id="tab-calculator" data-tab="calculator" aria-selected="true" aria-controls="panel-calculator">Kalkulačka</button>
+        <button type="button" class="tab" role="tab" id="tab-pricelist" data-tab="pricelist" aria-selected="false" aria-controls="panel-pricelist">Ceník</button>
+      </nav>
+
+      <div id="panel-calculator" role="tabpanel" aria-labelledby="tab-calculator">
+        <form id="pdr-form">
+          <section class="card">
+            <h2>Průměr důlků</h2>
+            <div class="diameter-options">
+              <label><input type="radio" name="diameter" value="20" checked> <span>20 mm</span></label>
+              <label><input type="radio" name="diameter" value="30"> <span>30 mm</span></label>
+              <label><input type="radio" name="diameter" value="40"> <span>40 mm</span></label>
+            </div>
+          </section>
+
+          <section class="card">
+            <h2>Poškozené díly</h2>
+            <div id="parts-list"></div>
+            <div class="actions">
+              <button type="button" id="add-part" class="btn btn-secondary">Přidat díl</button>
+              <button type="submit" class="btn btn-primary">Spočítat</button>
+            </div>
+          </section>
+        </form>
 
         <section class="card">
-          <h2>Poškozené díly</h2>
-          <div id="parts-list"></div>
-          <div class="actions">
-            <button type="button" id="add-part" class="btn btn-secondary">Přidat díl</button>
-            <button type="submit" class="btn btn-primary">Spočítat</button>
+          <h2>Výsledek</h2>
+          <p id="result-empty" class="empty">Zadejte alespoň jeden díl s počtem důlků.</p>
+          <div id="result-content" hidden>
+            <table>
+              <thead>
+                <tr>
+                  <th>Díl</th>
+                  <th>Počet</th>
+                  <th>Pásmo</th>
+                  <th>Ceníková skupina</th>
+                  <th class="num">Cena dílu</th>
+                </tr>
+              </thead>
+              <tbody id="result-rows"></tbody>
+            </table>
+            <div class="totals">
+              <div><span>Součet před materiálem</span><strong id="sum-before-material"></strong></div>
+              <div><span>Drobný materiál 2 %</span><strong id="sum-material"></strong></div>
+              <div><span>Celkem bez DPH</span><strong id="sum-without-vat"></strong></div>
+              <div><span>DPH 21 %</span><strong id="sum-vat"></strong></div>
+              <div class="total"><span>Celkem s DPH</span><span id="sum-with-vat"></span></div>
+            </div>
+          </div>
+          <p class="note">Ceník Doktor Dülek. Stejný díl lze přidat vícekrát (například levé a pravé dveře zvlášť).</p>
+        </section>
+      </div>
+
+      <div id="panel-pricelist" role="tabpanel" aria-labelledby="tab-pricelist" hidden>
+        <section class="card">
+          <h2>Ceník</h2>
+          <p class="empty pricelist-intro">Ceny bez DPH a bez 2 % drobného materiálu. Přepněte průměr a zkontrolujte, jestli sedí s papírovým ceníkem.</p>
+          <div class="diameter-options pricelist-diameters">
+            <label><input type="radio" name="pricelist-diameter" value="20" checked> <span>20 mm</span></label>
+            <label><input type="radio" name="pricelist-diameter" value="30"> <span>30 mm</span></label>
+            <label><input type="radio" name="pricelist-diameter" value="40"> <span>40 mm</span></label>
+          </div>
+          <div class="table-wrap">
+            <table class="pricelist-table">
+              <thead>
+                <tr>
+                  <th>Počet důlků</th>
+                  <th class="num">Kapota / střecha</th>
+                  <th class="num">Blatník / dveře</th>
+                  <th class="num">Boční rám / kufr</th>
+                </tr>
+              </thead>
+              <tbody id="pricelist-rows"></tbody>
+            </table>
           </div>
         </section>
-      </form>
-
-      <section class="card">
-        <h2>Výsledek</h2>
-        <p id="result-empty" class="empty">Zadejte alespoň jeden díl s počtem důlků.</p>
-        <div id="result-content" hidden>
-          <table>
-            <thead>
-              <tr>
-                <th>Díl</th>
-                <th>Počet</th>
-                <th>Pásmo</th>
-                <th>Ceníková skupina</th>
-                <th class="num">Cena dílu</th>
-              </tr>
-            </thead>
-            <tbody id="result-rows"></tbody>
-          </table>
-          <div class="totals">
-            <div><span>Součet před materiálem</span><strong id="sum-before-material"></strong></div>
-            <div><span>Drobný materiál 2 %</span><strong id="sum-material"></strong></div>
-            <div><span>Celkem bez DPH</span><strong id="sum-without-vat"></strong></div>
-            <div><span>DPH 21 %</span><strong id="sum-vat"></strong></div>
-            <div class="total"><span>Celkem s DPH</span><span id="sum-with-vat"></span></div>
-          </div>
-        </div>
-        <p class="note">Ceník Doktor Dülek. Stejný díl lze přidat vícekrát (například levé a pravé dveře zvlášť).</p>
-      </section>
+      </div>
     </main>
     <script src="app.js"></script>
   </body>

@@ -412,7 +412,7 @@ function partOptionsHtml(selected) {
   ).join("");
 }
 
-function addPartRow(partName = "kapota", count = 1) {
+function addPartRow(partName = "kapota", count = "") {
   const list = document.getElementById("parts-list");
   const row = document.createElement("div");
   row.className = "part-row";
@@ -423,7 +423,7 @@ function addPartRow(partName = "kapota", count = 1) {
     </label>
     <label class="field">
       <span>Počet důlků</span>
-      <input class="part-count" type="number" min="1" step="1" value="${count}">
+      <input class="part-count" type="number" min="1" step="1" value="${count}" placeholder="0">
     </label>
     <button type="button" class="btn btn-ghost remove-part" aria-label="Odebrat díl">Odebrat</button>
   `;
@@ -494,10 +494,39 @@ function renderResult() {
   document.getElementById("sum-with-vat").textContent = formatCzk(prices.priceWithVat);
 }
 
+function selectedPricelistDiameter() {
+  const checked = document.querySelector('input[name="pricelist-diameter"]:checked');
+  return checked ? checked.value : "20";
+}
+
+function renderPriceList() {
+  const diameter = selectedPricelistDiameter();
+  const tbody = document.getElementById("pricelist-rows");
+  const groups = [CarPart.KAPOTA_STRECHA, CarPart.BLATNIK_DVERE, CarPart.BOCNI_RAM_KUFR];
+
+  tbody.innerHTML = PRICE_RANGES.map(([, rangeStr]) => {
+    const cells = groups
+      .map((group) => {
+        const price = PRICE_TABLE[group]?.[diameter]?.[rangeStr];
+        return `<td class="num">${price == null ? "—" : formatCzk(price)}</td>`;
+      })
+      .join("");
+    return `<tr><td>${rangeStr}</td>${cells}</tr>`;
+  }).join("");
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll(".tab").forEach((tab) => {
+    const isActive = tab.dataset.tab === tabName;
+    tab.classList.toggle("is-active", isActive);
+    tab.setAttribute("aria-selected", String(isActive));
+  });
+  document.getElementById("panel-calculator").hidden = tabName !== "calculator";
+  document.getElementById("panel-pricelist").hidden = tabName !== "pricelist";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
-  addPartRow("kapota", 21);
-  addPartRow("střecha", 32);
-  addPartRow("kufr", 1);
+  addPartRow();
 
   document.getElementById("add-part").addEventListener("click", () => {
     addPartRow();
@@ -513,5 +542,14 @@ document.addEventListener("DOMContentLoaded", () => {
     input.addEventListener("change", renderResult);
   });
 
+  document.querySelectorAll('input[name="pricelist-diameter"]').forEach((input) => {
+    input.addEventListener("change", renderPriceList);
+  });
+
+  document.querySelectorAll(".tab").forEach((tab) => {
+    tab.addEventListener("click", () => switchTab(tab.dataset.tab));
+  });
+
   renderResult();
+  renderPriceList();
 });
