@@ -105,7 +105,7 @@
 
       .part-row {
         display: grid;
-        grid-template-columns: 1fr 140px auto;
+        grid-template-columns: minmax(140px, 1.4fr) 120px 130px auto;
         gap: 12px;
         align-items: end;
         margin-bottom: 12px;
@@ -251,7 +251,13 @@
         margin: 0 0 16px;
       }
 
-      @media (max-width: 640px) {
+      .hint {
+        margin: 10px 0 0;
+        font-size: 0.85rem;
+        color: var(--muted);
+      }
+
+      @media (max-width: 720px) {
         .part-row {
           grid-template-columns: 1fr;
         }
@@ -271,12 +277,13 @@
       <div id="panel-calculator" role="tabpanel" aria-labelledby="tab-calculator">
         <form id="pdr-form">
           <section class="card">
-            <h2>Průměr důlků</h2>
+            <h2>Výchozí průměr důlků</h2>
             <div class="diameter-options">
               <label><input type="radio" name="diameter" value="20" checked> <span>20 mm</span></label>
               <label><input type="radio" name="diameter" value="30"> <span>30 mm</span></label>
               <label><input type="radio" name="diameter" value="40"> <span>40 mm</span></label>
             </div>
+            <p class="hint">Platí pro všechny díly, u kterých není průměr přepsaný.</p>
           </section>
 
           <section class="card">
@@ -298,6 +305,7 @@
                 <tr>
                   <th>Díl</th>
                   <th>Počet</th>
+                  <th>Průměr</th>
                   <th>Pásmo</th>
                   <th>Ceníková skupina</th>
                   <th class="num">Cena dílu</th>
@@ -313,7 +321,7 @@
               <div class="total"><span>Celkem s DPH</span><span id="sum-with-vat"></span></div>
             </div>
           </div>
-          <p class="note">Ceník Doktor Dülek. Stejný díl lze přidat vícekrát (například levé a pravé dveře zvlášť).</p>
+          <p class="note">Ceník Doktor Dülek. U každého dílu lze průměr změnit, pokud se liší od výchozího. Stejný díl lze přidat vícekrát.</p>
         </section>
       </div>
 

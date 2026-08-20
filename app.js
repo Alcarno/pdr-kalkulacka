@@ -353,16 +353,16 @@ function getPartType(part) {
   throw new Error(`Unknown part type: ${part}`);
 }
 
-function calculatePdrPrice(damageParts, diameter) {
+function calculatePdrPrice(damageParts) {
   let totalPrice = 0;
   const calculationDetails = [];
-  const diameterKey = String(diameter || "20");
 
-  for (const { partName, count } of damageParts) {
+  for (const { partName, count, diameter } of damageParts) {
     if (!partName || !Number.isFinite(count) || count < 1) {
       continue;
     }
 
+    const diameterKey = String(diameter || "20");
     const partType = getPartType(partName);
     const priceRange = getPriceRange(count);
     const partPrice = PRICE_TABLE[partType]?.[diameterKey]?.[priceRange];
@@ -375,6 +375,7 @@ function calculatePdrPrice(damageParts, diameter) {
     calculationDetails.push({
       partName,
       count,
+      diameter: diameterKey,
       partType,
       priceRange,
       partPrice,
@@ -412,6 +413,27 @@ function partOptionsHtml(selected) {
   ).join("");
 }
 
+function defaultDiameterLabel() {
+  return `Výchozí (${selectedDiameter()} mm)`;
+}
+
+function diameterOptionsHtml(selected = "") {
+  const defaultOption = `<option value="" ${selected === "" ? "selected" : ""}>${defaultDiameterLabel()}</option>`;
+  const rest = ["20", "30", "40"]
+    .map(
+      (diameter) =>
+        `<option value="${diameter}" ${selected === diameter ? "selected" : ""}>${diameter} mm</option>`,
+    )
+    .join("");
+  return defaultOption + rest;
+}
+
+function updateDefaultDiameterLabels() {
+  document.querySelectorAll(".part-diameter option[value='']").forEach((option) => {
+    option.textContent = defaultDiameterLabel();
+  });
+}
+
 function addPartRow(partName = "kapota", count = "") {
   const list = document.getElementById("parts-list");
   const row = document.createElement("div");
@@ -420,6 +442,10 @@ function addPartRow(partName = "kapota", count = "") {
     <label class="field">
       <span>Díl</span>
       <select class="part-name">${partOptionsHtml(partName)}</select>
+    </label>
+    <label class="field">
+      <span>Průměr</span>
+      <select class="part-diameter">${diameterOptionsHtml()}</select>
     </label>
     <label class="field">
       <span>Počet důlků</span>
@@ -436,6 +462,7 @@ function addPartRow(partName = "kapota", count = "") {
     renderResult();
   });
   row.querySelector(".part-name").addEventListener("change", renderResult);
+  row.querySelector(".part-diameter").addEventListener("change", renderResult);
   row.querySelector(".part-count").addEventListener("input", renderResult);
   updateRemoveButtons();
 }
@@ -448,9 +475,11 @@ function updateRemoveButtons() {
 }
 
 function collectDamageParts() {
+  const defaultDiameter = selectedDiameter();
   return Array.from(document.querySelectorAll(".part-row")).map((row) => ({
     partName: row.querySelector(".part-name").value,
     count: Number.parseInt(row.querySelector(".part-count").value, 10),
+    diameter: row.querySelector(".part-diameter").value || defaultDiameter,
   }));
 }
 
@@ -460,7 +489,7 @@ function selectedDiameter() {
 }
 
 function renderResult() {
-  const prices = calculatePdrPrice(collectDamageParts(), selectedDiameter());
+  const prices = calculatePdrPrice(collectDamageParts());
   const empty = document.getElementById("result-empty");
   const content = document.getElementById("result-content");
   const tbody = document.getElementById("result-rows");
@@ -479,6 +508,7 @@ function renderResult() {
         <tr>
           <td>${detail.partName}</td>
           <td>${detail.count}</td>
+          <td>${detail.diameter} mm</td>
           <td>${detail.priceRange}</td>
           <td>${PART_TYPE_LABELS[detail.partType]}</td>
           <td class="num">${formatCzk(detail.partPrice)}</td>
@@ -539,7 +569,10 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
   document.querySelectorAll('input[name="diameter"]').forEach((input) => {
-    input.addEventListener("change", renderResult);
+    input.addEventListener("change", () => {
+      updateDefaultDiameterLabels();
+      renderResult();
+    });
   });
 
   document.querySelectorAll('input[name="pricelist-diameter"]').forEach((input) => {
