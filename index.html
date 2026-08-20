@@ -296,6 +296,53 @@
           grid-template-columns: 1fr;
         }
       }
+
+      .print-only {
+        display: none;
+      }
+
+      @media print {
+        body {
+          background: #fff;
+          color: #000;
+        }
+
+        main {
+          max-width: none;
+          padding: 0;
+        }
+
+        .tab-radio,
+        .tabs,
+        #pdr-form,
+        #panel-pricelist,
+        #result-empty,
+        .note,
+        .no-print {
+          display: none !important;
+        }
+
+        #panel-calculator,
+        #result-content:not([hidden]) {
+          display: block !important;
+        }
+
+        .card {
+          border: 0;
+          padding: 0;
+          margin: 0;
+        }
+
+        .print-only {
+          display: block;
+          margin: 0 0 16px;
+          color: #333;
+        }
+
+        .totals .total {
+          color: #000;
+        }
+      }
     </style>
   </head>
   <body>
@@ -336,6 +383,7 @@
           <h2>Výsledek</h2>
           <p id="result-empty" class="empty">Zadejte alespoň jeden díl s počtem důlků.</p>
           <div id="result-content" hidden>
+            <p id="print-meta" class="print-only"></p>
             <table>
               <thead>
                 <tr>
@@ -355,6 +403,9 @@
               <div><span>Celkem bez DPH</span><strong id="sum-without-vat"></strong></div>
               <div><span>DPH 21 %</span><strong id="sum-vat"></strong></div>
               <div class="total"><span>Celkem s DPH</span><span id="sum-with-vat"></span></div>
+            </div>
+            <div class="actions no-print">
+              <button type="button" id="print-result" class="btn btn-secondary">Tisk / PDF</button>
             </div>
           </div>
           <p class="note">U každého dílu lze průměr změnit, pokud se liší od výchozího. Stejný díl lze přidat vícekrát.</p>
@@ -504,6 +555,6 @@
         </section>
       </div>
     </main>
-    <script src="app.js?v=4"></script>
+    <script src="app.js?v=5"></script>
   </body>
 </html>

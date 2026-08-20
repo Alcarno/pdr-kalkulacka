@@ -522,6 +522,8 @@ function renderResult() {
   document.getElementById("sum-without-vat").textContent = formatCzk(prices.priceWithoutVat);
   document.getElementById("sum-vat").textContent = formatCzk(prices.vatAmount);
   document.getElementById("sum-with-vat").textContent = formatCzk(prices.priceWithVat);
+  document.getElementById("print-meta").textContent =
+    `Datum výpočtu: ${new Date().toLocaleDateString("cs-CZ")}`;
 }
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -542,6 +544,10 @@ document.addEventListener("DOMContentLoaded", () => {
       updateDefaultDiameterLabels();
       renderResult();
     });
+  });
+
+  document.getElementById("print-result").addEventListener("click", () => {
+    window.print();
   });
 
   renderResult();
