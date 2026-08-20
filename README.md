@@ -1,6 +1,6 @@
 # PDR kalkulačka
 
-Jednoduchý výpočtový formulář opravy důlků (PDR) podle ceníku Doktor Dülek.
+Jednoduchý výpočtový formulář opravy důlků (PDR) podle ceníku.
 
 ## Jak otevřít
 
