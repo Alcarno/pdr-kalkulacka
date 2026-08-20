@@ -524,37 +524,6 @@ function renderResult() {
   document.getElementById("sum-with-vat").textContent = formatCzk(prices.priceWithVat);
 }
 
-function selectedPricelistDiameter() {
-  const checked = document.querySelector('input[name="pricelist-diameter"]:checked');
-  return checked ? checked.value : "20";
-}
-
-function renderPriceList() {
-  const diameter = selectedPricelistDiameter();
-  const tbody = document.getElementById("pricelist-rows");
-  const groups = [CarPart.KAPOTA_STRECHA, CarPart.BLATNIK_DVERE, CarPart.BOCNI_RAM_KUFR];
-
-  tbody.innerHTML = PRICE_RANGES.map(([, rangeStr]) => {
-    const cells = groups
-      .map((group) => {
-        const price = PRICE_TABLE[group]?.[diameter]?.[rangeStr];
-        return `<td class="num">${price == null ? "—" : formatCzk(price)}</td>`;
-      })
-      .join("");
-    return `<tr><td>${rangeStr}</td>${cells}</tr>`;
-  }).join("");
-}
-
-function switchTab(tabName) {
-  document.querySelectorAll(".tab").forEach((tab) => {
-    const isActive = tab.dataset.tab === tabName;
-    tab.classList.toggle("is-active", isActive);
-    tab.setAttribute("aria-selected", String(isActive));
-  });
-  document.getElementById("panel-calculator").hidden = tabName !== "calculator";
-  document.getElementById("panel-pricelist").hidden = tabName !== "pricelist";
-}
-
 document.addEventListener("DOMContentLoaded", () => {
   addPartRow();
 
@@ -575,14 +544,5 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  document.querySelectorAll('input[name="pricelist-diameter"]').forEach((input) => {
-    input.addEventListener("change", renderPriceList);
-  });
-
-  document.querySelectorAll(".tab").forEach((tab) => {
-    tab.addEventListener("click", () => switchTab(tab.dataset.tab));
-  });
-
   renderResult();
-  renderPriceList();
 });
